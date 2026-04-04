@@ -1,0 +1,55 @@
+# Hey ThinkPad GUI Overview
+
+The current GUI in `app/main.py` provides a real-time interface for local wake-word detection. It is built using **Tkinter** and integrates with the `LiveInference` and `AudioStream` modules to process live microphone input.
+
+---
+
+## 🖼️ Visual Interface
+Based on the implementation in [main.py](file:///d:/dev/Metrics-Insights/llm-rag-exec/tensorflow/Micro-Speech/app/main.py), here is a high-fidelity mockup of the application's current layout:
+
+![Hey ThinkPad GUI Mockup](file:///C:/Users/zuyin/.gemini/antigravity/brain/3eba5f34-d544-4608-b878-038a691516c1/hey_thinkpad_gui_mockup_1775313660944.png)
+
+---
+
+## 🛠️ Key Components
+
+### 🎤 Audio Device Selection
+- **Type**: `ttk.Combobox`
+- **Function**: Automatically lists available input devices (Microphones) from the system.
+- **Auto-Discovery**: Uses `AudioStream.get_devices()` to populate the list on startup.
+
+### 🎚️ Confidence Threshold
+- **Type**: `tk.Scale` (Horizontal)
+- **Range**: 0.0 to 1.0 (defaults to 0.7)
+- **Function**: Adjusts the sensitivity of the detector. Higher values reduce false positives but may require more "confident" speech.
+
+### 🔵 Detection Status & Feedback
+- **Live Label**: Displays the current prediction label (e.g., `yes`, `silence`, `unknown`) along with the confidence score (e.g., `0.92`).
+- **Visual Alert**: The background of the central prediction frame turns **Vibrant Green** when the wake-word is detected.
+- **Audio Alert**: Triggers a system beep (`\a`) upon detection.
+
+### 📝 Event Logging
+- **Type**: `tk.Text` (Read-only)
+- **Function**: Maintains a timestamped history of important events:
+    - Model loading status.
+    - Detection start/stop.
+    - High-confidence wake-word trigger events.
+
+---
+
+## ⚙️ How it Works (Under the Hood)
+1. **Model Loading**: Upon initialization, it attempts to load `model.tflite` from the `artifacts/` folder.
+2. **Polling Loop**: Once "Start Detection" is clicked, it runs a recursive `after()` loop every **250ms**.
+3. **Buffer Processing**: It pulls the last **1.5 seconds** of audio from the `AudioStream` ring buffer.
+4. **Feature Extraction**: Converts raw PCM data into a Mel-spectrogram (Log-Mel features).
+5. **Inference**: Feeds the features into the TFLite interpreter and checks the output against the threshold.
+
+---
+
+> [!TIP]
+> **Modernization Opportunity**:
+> While the current UI is functional, the `requirements.txt` includes `customtkinter`. We could refactor `app/main.py` to use a modern, dark-themed, glassmorphic design with smoother animations.
+
+> [!WARNING]
+> **Dependency Check**:
+> If you are running this locally, ensure you have ran `pip install -r requirements.txt`. Specifically, `librosa` and `sounddevice` are required for the audio backend to function correctly.
