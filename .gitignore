@@ -6,3 +6,4 @@ artifacts/
 src/__pycache__/
 cmake-build/
 lib/
+vbuild/
