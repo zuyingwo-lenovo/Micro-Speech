@@ -57,37 +57,37 @@ graph TD
 
 ---
 
-## 📂 詳細コンポーネント解説 (Detailed Reference)
+## 📂 Detailed Component Reference
 
-各ディレクトリ内の主要なファイルとその役割、使い方の詳細です。
+Detailed explanation of the main files in each directory, their roles, and how to use them.
 
-### 🐍 Pythonスクリプト (`src/`)
+### 🐍 Python Scripts (`src/`)
 
-モデルの学習、評価、データの拡張を担当します。
+Responsible for model training, evaluation, and data augmentation.
 
-- **`prepare_dataset.py`**: パイプライン・テスト用のダミーデータ生成
-  - **役割**: サイン波とノイズを組み合わせた擬似音声ファイルを生成し、学習フローが正しく動作するか確認するために使用します。
-  - **使い方**: `python src/prepare_dataset.py`
-- **`augment_audio.py`**: データ拡張（Augmentation）ツール
-  - **役割**: 少量の録音データから数千のバリエーション（ピッチ変更、ノイズ追加、時間シフト等）を生成し、モデルの堅牢性を高めます。
-  - **主要引数**: `--input` (入力元), `--output-dir` (出力先), `--num-aug` (1ファイルあたりの生成数)
-- **`train.py`**: モデル学習とTFLite出力
-  - **役割**: 音声データをメル・スペクトログラムに変換し、CNNモデルを学習させます。最終的に量子化された `model.tflite` を出力します。
-- **`infer_wav.py`**: 単一WAVファイルの推論テスト
-  - **役割**: 特定の音声ファイルに対して、学習済みモデルが正しく判定できるかコマンドラインでテストします。
-- **`inspect_audio.py`**: 音声データの統計確認
-  - **役割**: 指定したディレクトリ内の全WAVファイルのサンプリングレート、チャンネル数、長さの分布をレポートします。
-- **`audio_stream.py` / `live_inference.py`**: リアルタイム推論コア
-  - **役割**: マイクからの連続入力をリングバッファで管理し、250msごとにモデルを実行する「推論エンジン」の役割を果たします。
+- **`prepare_dataset.py`**: Dummy data generation for pipeline testing
+  - **Role**: Generates pseudo-audio files combining sine waves and noise to verify if the training flow works correctly.
+  - **Usage**: `python src/prepare_dataset.py`
+- **`augment_audio.py`**: Audio Data Augmentation Tool
+  - **Role**: Generates thousands of variations (pitch changes, noise, shifts, etc.) from a small set of recordings to enhance model robustness.
+  - **Arguments**: `--input` (input source), `--output-dir` (output directory), `--num-aug` (number of augmentations per file)
+- **`train.py`**: Model training and TFLite export
+  - **Role**: Converts audio to Mel Spectrograms, trains a CNN model, and exports the quantized `model.tflite`.
+- **`infer_wav.py`**: Single WAV file inference test
+  - **Role**: CLI tool to test if the model correctly identifies a specific audio file.
+- **`inspect_audio.py`**: Audio data statistics check
+  - **Role**: Scans a directory and reports statistics (sample rates, channels, duration distribution) for all WAV files.
+- **`audio_stream.py` / `live_inference.py`**: Real-time inference engine
+  - **Role**: Manages continuous microphone input using a ring buffer and runs the model every 250ms.
 
-### ⚙️ C++機能抽出 (`micro_features/`)
+### ⚙️ C++ Feature Extraction (`micro_features/`)
 
-マイコンやネイティブアプリで、Python版と同じ「音の視覚化（スペクトログラム生成）」を行うための最適化されたコードです。
+Optimized code for microcontrollers and native apps to perform the same "sound visualization" (spectrogram generation) as the Python version.
 
 - **`micro_features_generator.h/cc`**:
-  - **API**: `InitializeMicroFeatures()` で初期化し、`GenerateMicroFeatures()` に16bit PCMデータを渡すと、モデル入力用の8bit特徴量に変換します。
+  - **API**: Initialize with `InitializeMicroFeatures()` and call `GenerateMicroFeatures()` with 16-bit PCM data to get 8-bit features for the model.
 - **`micro_model_settings.h`**:
-  - **重要**: サンプリングレート(16kHz)や特徴量の次元数(40)などが定義されています。Python側で設定を変更した場合は、ここも合わせて変更して再ビルドする必要があります。
+  - **Important**: Defines constants like sample rate (16kHz) and feature dimensions (40). Updates here are required if training parameters change.
 
 ---
 
